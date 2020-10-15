@@ -1,20 +1,21 @@
 const qualList = ["4320", "2160", "1440", "1080", "720", "large", "medium", "480", "360", "240", "144", "auto"];
 let maxQuality = qualList[2];
+var videoctl;
+
 function init() {
-	let mo = new MutationObserver(setQuality);
-	mo.observe(document.querySelector("div.ytp-spinner"), {attributes: true});
+	videoctl = quals.G ? quals.G : quals.B ? quals.B : {};
 	setQuality();
 	setInterval(()=>{
-		let highest = getHighestQuality(quals.G.getAvailableQualityLevels(), maxQuality);
-		if (quals.G.getPlaybackQuality() !== highest) {
+		let highest = getHighestQuality(videoctl.getAvailableQualityLevels(), maxQuality);
+		if (videoctl.getPlaybackQuality() !== highest) {
 			setQuality(highest);
 		}		
 	},5000)
 }
 function setQuality() {
-	let availableQualities = quals.G.getAvailableQualityLevels();
+	let availableQualities = videoctl.getAvailableQualityLevels();
 	let quality = getHighestQuality(availableQualities, maxQuality);
-	quals.G.setPlaybackQuality(quality);
+	videoctl.setPlaybackQuality(quality);
 }
 function getHighestQuality(qualityList, max) {
 	let qualityIndex = qualList.indexOf(max);
@@ -31,7 +32,6 @@ function getHighestQuality(qualityList, max) {
 _waitForSelector("button.ytp-button.ytp-settings-button").then(elem => {
 	elem.click();
 	elem.click();
-	console.log("waiting?")
 	_waitForVar("quals").then(init);
 });
 async function _waitForVar(windowVar) {
@@ -45,7 +45,6 @@ async function _waitForVar(windowVar) {
 	});
 }
 async function _waitForSelector(selector, content) {
-	console.log("waiting for", selector);
 	return new Promise((resolve, reject) => {
 		let interval = setInterval((s, c) => {
 			let elem = document.querySelectorAll(s);
