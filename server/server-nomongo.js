@@ -30,10 +30,25 @@ app.get("/ytBase", async (req, res) => {
 		}
 	}
 });
+
 function makeReplacements(text, map) {
+	let changed = false;
 	for (let subarray of map) {
 		if (text.includes(subarray[0])) {
 			text = text.replace(subarray[0], subarray.join(""));
+			changed = true;
+		}
+	}
+	if (!changed) {
+		// targets the value of g.k that has the prototype function of setPlaybackQuality
+		let target = text.match(/(?<=g\.k=)(?:(?!g\.k=).)*(?=g\.k\.setPlaybackQuality=function\(a\))/s);
+		if (target) {
+			let player = target[0].slice(0, 2);
+			let regex = new RegExp(`(?<=;)([^;]*)=new ${player}[^;]*;`, "s");
+			let replacement = regex.exec(text);
+			if (replacement) {
+				text = text.replace(replacement[0], `${replacement[0]}window.quals=${replacement[1]};`);
+			}
 		}
 	}
 	return text;
